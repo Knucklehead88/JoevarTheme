@@ -1,0 +1,54 @@
+{% doc %}
+  @prompt
+    Create a polished header logo treatment that displays the store's uploaded logo icon and the store name “Joevar” side by side as one clickable brand mark. Preserve the existing header alignment, spacing, responsive behavior, and typography as much as possible, and make the logo and title link to the homepage.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+{% style %}
+  .ai-brand-mark-{{ ai_gen_id }} { display: flex; align-items: center; width: {{ block.settings.desktop_width_percent }}%; max-width: 100%; }
+  .ai-brand-mark-{{ ai_gen_id }}__link { display: inline-flex; align-items: center; gap: {{ block.settings.logo_gap }}px; color: {{ block.settings.text_color }}; text-decoration: none; min-height: 44px; max-width: 100%; border-radius: 4px; }
+  .ai-brand-mark-{{ ai_gen_id }}__link:focus-visible { outline: 2px solid {{ block.settings.focus_color }}; outline-offset: 4px; }
+  .ai-brand-mark-{{ ai_gen_id }}__logo, .ai-brand-mark-{{ ai_gen_id }}__placeholder { display: block; width: auto; height: {{ block.settings.logo_height }}px; max-width: 160px; object-fit: contain; flex: 0 0 auto; }
+  .ai-brand-mark-{{ ai_gen_id }}__placeholder { width: {{ block.settings.logo_height }}px; color: {{ block.settings.text_color }}; }
+  .ai-brand-mark-{{ ai_gen_id }}__placeholder svg { display: block; width: 100%; height: 100%; object-fit: contain; }
+  .ai-brand-mark-{{ ai_gen_id }}__name { margin: 0; color: inherit; font-family: inherit; font-size: {{ block.settings.name_size }}px; font-weight: {{ block.settings.name_weight }}; line-height: 1.1; letter-spacing: {{ block.settings.letter_spacing }}px; white-space: nowrap; }
+  @media screen and (max-width: 749px) {
+    .ai-brand-mark-{{ ai_gen_id }}__link { gap: {{ block.settings.mobile_logo_gap }}px; }
+    .ai-brand-mark-{{ ai_gen_id }}__logo, .ai-brand-mark-{{ ai_gen_id }}__placeholder { height: {{ block.settings.mobile_logo_height }}px; }
+    .ai-brand-mark-{{ ai_gen_id }}__placeholder { width: {{ block.settings.mobile_logo_height }}px; }
+    .ai-brand-mark-{{ ai_gen_id }}__name { font-size: {{ block.settings.mobile_name_size }}px; }
+  }
+{% endstyle %}
+<div class="ai-brand-mark-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <a class="ai-brand-mark-{{ ai_gen_id }}__link" href="{{ routes.root_url }}" aria-label="{{ shop.name | escape }} home">
+    {% if settings.logo != blank %}
+      <img class="ai-brand-mark-{{ ai_gen_id }}__logo" src="{{ settings.logo | image_url: height: 200 }}" alt="{{ shop.name | escape }}" loading="eager" width="{{ settings.logo.width }}" height="{{ settings.logo.height }}">
+    {% else %}
+      <span class="ai-brand-mark-{{ ai_gen_id }}__placeholder" aria-hidden="true">{{ 'image' | placeholder_svg_tag }}</span>
+    {% endif %}
+    <span class="ai-brand-mark-{{ ai_gen_id }}__name">{{ block.settings.store_name | escape }}</span>
+  </a>
+</div>
+{% schema %}
+{
+  "name": "Brand mark",
+  "settings": [
+    { "type": "text", "id": "store_name", "label": "Store name", "default": "Joevar" },
+    { "type": "range", "id": "desktop_width_percent", "label": "Desktop width", "min": 50, "max": 100, "step": 5, "unit": "%", "default": 100 },
+    { "type": "header", "content": "Logo" },
+    { "type": "range", "id": "logo_height", "label": "Height", "min": 20, "max": 80, "step": 2, "unit": "px", "default": 36 },
+    { "type": "range", "id": "mobile_logo_height", "label": "Mobile height", "min": 18, "max": 60, "step": 2, "unit": "px", "default": 28 },
+    { "type": "range", "id": "logo_gap", "label": "Gap", "min": 4, "max": 32, "step": 2, "unit": "px", "default": 10 },
+    { "type": "range", "id": "mobile_logo_gap", "label": "Mobile gap", "min": 4, "max": 24, "step": 2, "unit": "px", "default": 8 },
+    { "type": "header", "content": "Typography" },
+    { "type": "range", "id": "name_size", "label": "Size", "min": 12, "max": 40, "step": 1, "unit": "px", "default": 20 },
+    { "type": "range", "id": "mobile_name_size", "label": "Mobile size", "min": 12, "max": 32, "step": 1, "unit": "px", "default": 17 },
+    { "type": "select", "id": "name_weight", "label": "Weight", "options": [{ "value": "400", "label": "Regular" }, { "value": "500", "label": "Medium" }, { "value": "600", "label": "Semibold" }, { "value": "700", "label": "Bold" }], "default": "600" },
+    { "type": "range", "id": "letter_spacing", "label": "Letter spacing", "min": -1, "max": 3, "step": 0.5, "unit": "px", "default": 0 },
+    { "type": "color", "id": "text_color", "label": "Text", "default": "#000000" },
+    { "type": "color", "id": "focus_color", "label": "Focus outline", "default": "#000000" }
+  ],
+  "presets": [{ "name": "Brand mark" }],
+  "tag": null,
+  "class": "brand-mark-block"
+}
+{% endschema %}

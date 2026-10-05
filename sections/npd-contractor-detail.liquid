@@ -1,0 +1,174 @@
+<section class="npd-contractor-detail">
+  <div class="page-width">
+    <div id="npd-contractor-detail-wrap">
+      {% for contractor in shop.metaobjects.contractor.values %}
+        <div class="npd-contractor-detail-card" data-handle="{{ contractor.handle }}" style="display:none;">
+          <div class="npd-contractor-detail-layout">
+
+            <div class="npd-contractor-detail-info">
+              <h1 class="npd-contractor-detail-name">{{ contractor.name }}</h1>
+
+              {% if contractor.company %}
+                <p><strong>{{ contractor.company }}</strong></p>
+              {% endif %}
+
+              {% if contractor.trade %}
+                <p>{{ contractor.trade }}</p>
+              {% endif %}
+
+              {% if contractor.address %}
+                <p>{{ contractor.address }}</p>
+              {% endif %}
+
+              {% if contractor.city %}
+                <p>{{ contractor.city }}</p>
+              {% endif %}
+
+              {% if contractor.state %}
+                <p>{{ contractor.state }}</p>
+              {% endif %}
+
+              {% if contractor.email %}
+                <p>
+                  <strong>Email:</strong>
+                  <a href="mailto:{{ contractor.email }}">{{ contractor.email }}</a>
+                </p>
+              {% endif %}
+
+              {% if contractor.mobile %}
+                <p>
+                  <strong>Phone:</strong>
+                  <a href="tel:{{ contractor.mobile | replace: ' ', '' | replace: '-', '' | replace: '(', '' | replace: ')', '' }}">
+                    {{ contractor.mobile }}
+                  </a>
+                </p>
+              {% endif %}
+
+              {% if contractor.website %}
+                <p>
+                  <strong>Website:</strong>
+                  <a href="{{ contractor.website }}" target="_blank" rel="noopener">
+                    {{ contractor.website }}
+                  </a>
+                </p>
+              {% endif %}
+            </div>
+
+            <div class="npd-contractor-detail-image">
+              {% if contractor.image %}
+                <img
+                  src="{{ contractor.image | image_url: width: 1200 }}"
+                  alt="{{ contractor.name | escape }}"
+                  width="600"
+                  height="600"
+                >
+              {% endif %}
+            </div>
+
+          </div>
+        </div>
+      {% endfor %}
+
+      <div id="npd-contractor-not-found" style="display:none;">
+        <p>Contractor not found.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.npd-contractor-detail {
+  padding: 60px 0;
+}
+
+.npd-contractor-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 50px;
+  align-items: start;
+}
+
+.npd-contractor-detail-info h1 {
+  margin: 0 0 18px;
+  font-size: 34px;
+  line-height: 1.2;
+}
+
+.npd-contractor-detail-info p {
+  margin: 0 0 12px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.npd-contractor-detail-info a {
+  color: #16a34a;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.npd-contractor-detail-info a:hover {
+  text-decoration: underline;
+}
+
+.npd-contractor-detail-image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 18px;
+  object-fit: contain;
+  background: #f8f8f8;
+}
+
+#npd-contractor-not-found {
+  text-align: center;
+  padding: 40px 0;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .npd-contractor-detail-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .npd-contractor-detail-info h1 {
+    font-size: 28px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var params = new URLSearchParams(window.location.search);
+  var contractorHandle = params.get('contractor');
+  var cards = document.querySelectorAll('.npd-contractor-detail-card');
+  var found = false;
+
+  if (contractorHandle) {
+    cards.forEach(function(card) {
+      if (card.getAttribute('data-handle') === contractorHandle) {
+        card.style.display = 'block';
+        found = true;
+      }
+    });
+  }
+
+  if (!found) {
+    var notFound = document.getElementById('npd-contractor-not-found');
+    if (notFound) notFound.style.display = 'block';
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "NPD Contractor Detail",
+  "settings": [],
+  "presets": [
+    {
+      "name": "NPD Contractor Detail"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,236 @@
+<section class="npd-faq-section">
+  <div class="page-width">
+
+    {% if section.settings.heading != blank %}
+      <div class="npd-faq-header">
+        <h2>{{ section.settings.heading }}</h2>
+      </div>
+    {% endif %}
+
+    <!-- CONTROLS -->
+    <div class="npd-faq-controls">
+      <input type="text" placeholder="Search questions..." id="npd-faq-search-input">
+      <button id="npd-toggle-all" class="npd-toggle-btn">
+        Expand All
+      </button>
+    </div>
+
+    <div class="npd-faq-grid" id="npd-faq-grid">
+
+      {% for block in section.blocks %}
+        <div class="npd-faq-item" {{ block.shopify_attributes }} data-question="{{ block.settings.question | downcase }}">
+          
+          <button class="npd-faq-question">
+            <span>{{ block.settings.question }}</span>
+            <span class="npd-icon">+</span>
+          </button>
+
+          <div class="npd-faq-answer">
+            <div class="npd-faq-answer-inner">
+              {{ block.settings.answer }}
+            </div>
+          </div>
+
+        </div>
+      {% endfor %}
+
+    </div>
+
+  </div>
+</section>
+
+<style>
+.npd-faq-section {
+  padding: 80px 0;
+}
+
+.npd-faq-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+/* CONTROLS */
+.npd-faq-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.npd-faq-controls input {
+  flex: 1;
+  min-width: 250px;
+  padding: 12px 18px;
+  border-radius: 30px;
+  border: 1px solid #ddd;
+}
+
+.npd-toggle-btn {
+  padding: 12px 20px;
+  border-radius: 30px;
+  border: none;
+  background:rgb(38, 139, 25);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* GRID */
+.npd-faq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+}
+
+/* ITEM */
+.npd-faq-item {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+  overflow: hidden;
+}
+
+.npd-faq-question {
+  width: 100%;
+  background: #f8f8f8;
+  border: none;
+  padding: 20px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.npd-icon {
+  font-size: 22px;
+  transition: transform 0.3s ease;
+}
+
+.npd-faq-answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.npd-faq-answer-inner {
+  padding: 0 25px 20px 25px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.npd-faq-item.active .npd-faq-answer {
+  max-height: 600px;
+}
+
+.npd-faq-item.active .npd-icon {
+  transform: rotate(45deg);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .npd-faq-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .npd-faq-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+  const items = document.querySelectorAll(".npd-faq-item");
+  const toggleBtn = document.getElementById("npd-toggle-all");
+  const searchInput = document.getElementById("npd-faq-search-input");
+
+  let allExpanded = false;
+
+  // Individual accordion
+  items.forEach(item => {
+    const button = item.querySelector(".npd-faq-question");
+
+    button.addEventListener("click", () => {
+      if (!allExpanded) {
+        items.forEach(i => {
+          if (i !== item) i.classList.remove("active");
+        });
+      }
+      item.classList.toggle("active");
+    });
+  });
+
+  // Expand / Collapse All
+  toggleBtn.addEventListener("click", () => {
+    allExpanded = !allExpanded;
+
+    items.forEach(item => {
+      if (allExpanded) {
+        item.classList.add("active");
+      } else {
+        item.classList.remove("active");
+      }
+    });
+
+    toggleBtn.textContent = allExpanded ? "Collapse All" : "Expand All";
+  });
+
+  // Search
+  searchInput.addEventListener("input", function() {
+    const value = this.value.toLowerCase();
+
+    items.forEach(item => {
+      const question = item.dataset.question;
+      if (question.includes(value)) {
+        item.style.display = "block";
+      } else {
+        item.style.display = "none";
+      }
+    });
+  });
+
+});
+</script>
+
+{% schema %}
+{
+  "name": "NPD FAQ Advanced",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Frequently Asked Questions"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 50,
+  "presets": [
+    {
+      "name": "NPD FAQ Advanced"
+    }
+  ]
+}
+{% endschema %}

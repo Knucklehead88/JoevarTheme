@@ -1,0 +1,207 @@
+<div class="npd-contact-video">
+
+  <div class="npd-contact">
+    <h2>{{ section.settings.heading }}</h2>
+
+    {% form 'contact' %}
+      <input type="hidden" name="contact[subject]" value="{{ section.settings.email_subject }}">
+      <input type="hidden" name="contact[Recipient]" value="{{ section.settings.recipient_email }}">
+
+      <div class="npd-field">
+        <input type="text" name="contact[name]" placeholder="Full Name" required>
+      </div>
+
+      <div class="npd-field">
+        <input type="email" name="contact[email]" placeholder="Email Address" required>
+      </div>
+
+      <div class="npd-field">
+        <input type="tel" name="contact[phone]" placeholder="Phone Number">
+      </div>
+
+      <div class="npd-field">
+        <textarea name="contact[body]" placeholder="How can we help?" rows="5" required></textarea>
+      </div>
+
+      <button type="submit" class="npd-submit">
+        {{ section.settings.button_label }}
+      </button>
+
+      {% if form.posted_successfully? %}
+        <p class="npd-success">
+          {{ section.settings.success_message }}
+        </p>
+      {% endif %}
+
+      {% if form.errors %}
+        <div class="npd-errors">
+          {{ form.errors | default_errors }}
+        </div>
+      {% endif %}
+    {% endform %}
+  </div>
+
+  <div class="npd-video">
+    {% if section.settings.video != blank %}
+      <div class="npd-video-wrapper">
+        {{ section.settings.video | video_tag: controls: true, playsinline: true, preload: 'metadata' }}
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<style>
+.npd-contact-video {
+  display: grid;
+  grid-template-columns: minmax(0, 40%) minmax(0, 60%);
+  gap: 60px;
+  align-items: stretch;
+  padding: 60px 20px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+.npd-contact {
+  align-self: start;
+  min-width: 0;
+}
+
+.npd-contact h2 {
+  margin-bottom: 25px;
+}
+
+.npd-field {
+  margin-bottom: 16px;
+}
+
+.npd-field input,
+.npd-field textarea {
+  width: 100%;
+  padding: 13px 15px;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  transition: 0.2s ease;
+  box-sizing: border-box;
+}
+
+.npd-field input:focus,
+.npd-field textarea:focus {
+  outline: none;
+  border-color: black;
+}
+
+.npd-submit {
+  margin-top: 10px;
+  padding: 14px 26px;
+  border-radius: 4px;
+  border: none;
+  background: black;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.npd-submit:hover {
+  opacity: 0.85;
+}
+
+.npd-success {
+  margin-top: 18px;
+  color: green;
+}
+
+.npd-errors {
+  margin-top: 18px;
+  color: red;
+}
+
+.npd-video {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.npd-video-wrapper {
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 2 / 1;   /* wider than taller */
+  max-height: 420px;     /* prevents it becoming too tall */
+  margin: 0 auto;
+  border-radius: 18px;
+  overflow: hidden;
+  background: #000;
+}
+
+.npd-video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .npd-contact-video {
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  .npd-video-wrapper {
+    border-radius: 14px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "NPD Contact + Video",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Form Heading",
+      "default": "Get In Touch"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "Send Message"
+    },
+    {
+      "type": "text",
+      "id": "email_subject",
+      "label": "Email Subject",
+      "default": "Website Contact Form Submission"
+    },
+    {
+      "type": "text",
+      "id": "recipient_email",
+      "label": "Recipient Email (for internal routing)",
+      "default": "sales@yourstore.com"
+    },
+    {
+      "type": "textarea",
+      "id": "success_message",
+      "label": "Success Message",
+      "default": "Thank you! We will contact you shortly."
+    },
+    {
+      "type": "video",
+      "id": "video",
+      "label": "Upload or Select Video"
+    }
+  ],
+  "presets": [
+    {
+      "name": "NPD Contact + Video"
+    }
+  ]
+}
+{% endschema %}

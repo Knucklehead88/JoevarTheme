@@ -1,0 +1,732 @@
+<section class="npd-contractors">
+  <div class="page-width">
+    <div class="npd-shell">
+      <div class="npd-layout">
+
+        <aside class="npd-sidebar">
+          <h3>Filter by State</h3>
+
+          <div class="npd-state-checkboxes" id="npd-state-checkboxes"></div>
+
+          <div class="npd-state-dropdown">
+            <select id="npd-mobile-state-select">
+              <option value="all">All States</option>
+            </select>
+          </div>
+        </aside>
+
+        <div class="npd-main">
+          <h2 id="npd-directory-heading">{{ section.settings.heading }}</h2>
+          
+          {% assign contractor_page_url = '/pages/contractor-details' %}
+
+          <div class="npd-contractors-grid" id="npd-contractors-grid">
+            {% for contractor in shop.metaobjects.contractor.values %}
+              <a
+                class="npd-contractor-card"
+                href="{{ contractor_page_url }}?contractor={{ contractor.handle | url_encode }}"
+                data-state="{{ contractor.state | strip | downcase }}"
+                data-city="{{ contractor.city | strip | downcase }}"
+                data-category="{{ contractor.trade | strip | downcase }}"
+              >
+                {% if contractor.image %}
+                  <img
+                    src="{{ contractor.image | image_url: width: 800 }}"
+                    width="400"
+                    height="260"
+                    alt="{{ contractor.name | escape }}"
+                  >
+                {% endif %}
+
+                <h3>{{ contractor.name }}</h3>
+
+                {% if contractor.company %}
+                  <p><strong>{{ contractor.company }}</strong></p>
+                {% endif %}
+
+                {% if contractor.trade %}
+                  <p>{{ contractor.trade }}</p>
+                {% endif %}
+
+                {% if contractor.address %}
+                  <p>{{ contractor.address }}</p>
+                {% endif %}
+
+                {% if contractor.state %}
+                  <p class="npd-state-label">{{ contractor.state }}</p>
+                {% endif %}
+
+                {% if contractor.email %}
+                  <p class="npd-contact-line">{{ contractor.email }}</p>
+                {% endif %}
+
+                {% if contractor.mobile %}
+                  <p class="npd-contact-line">{{ contractor.mobile }}</p>
+                {% endif %}
+              </a>
+            {% endfor %}
+          </div>
+
+          <p class="npd-no-results" id="npd-no-results" style="display:none;">
+            No contractors found for this selection.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.npd-no-results {
+  margin-top: 20px;
+  font-size: 15px;
+  color: #666;
+}
+
+.npd-shell {
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.npd-layout {
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+}
+
+.npd-sidebar {
+  width: 240px;
+  min-width: 240px;
+  position: sticky;
+  top: 120px;
+}
+
+.npd-sidebar h3 {
+  margin: 0 0 20px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.npd-state-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.npd-filter-state {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.npd-filter-city {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.npd-filter-state input,
+.npd-filter-city input,
+.npd-all-state input {
+  accent-color: #7c3aed;
+  cursor: pointer;
+}
+
+.npd-filter-group {
+  border: 1px solid #ececec;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.npd-filter-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.npd-filter-toggle:hover {
+  color:rgb(31, 175, 31);
+}
+
+.npd-filter-toggle-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.npd-filter-group.open .npd-filter-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.npd-filter-toggle-icon {
+  font-size: 12px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.npd-filter-panel {
+  display: none;
+  padding: 0 14px 14px;
+  border-top: 1px solid #f2f2f2;
+}
+
+.npd-filter-group.open .npd-filter-panel {
+  display: block;
+}
+
+.npd-filter-cities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  padding-top: 12px;
+}
+
+.npd-filter-city {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border: 1px solid #e9e9e9;
+  border-radius: 999px;
+  background: #fafafa;
+  line-height: 1.2;
+}
+
+.npd-filter-city:hover {
+  color: rgb(31, 175, 31);
+  border-color: #d8c6ff;
+}
+
+.npd-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.npd-checkbox-item:hover {
+  color: #7c3aed;
+}
+
+.npd-checkbox-item input {
+  accent-color: #7c3aed;
+  cursor: pointer;
+}
+
+.npd-all-state {
+  font-weight: 700;
+  padding-bottom: 10px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.npd-state-dropdown {
+  display: none;
+}
+
+.npd-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.npd-main h2 {
+  margin-bottom: 30px;
+}
+
+.npd-contractors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 35px;
+}
+
+.npd-contractor-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+  text-align: center;
+  transition: 0.3s ease;
+  overflow: hidden;
+}
+
+.npd-contractor-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.08);
+}
+
+.npd-contractor-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: contain;
+  object-position: center;
+  border-radius: 14px;
+  margin-bottom: 18px;
+  display: block;
+  background: #f8f8f8;
+}
+
+.npd-contractor-card h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.npd-contractor-card p {
+  margin: 4px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.npd-state-label {
+  font-size: 13px;
+  color: #888;
+  margin-top: 6px;
+}
+
+.npd-contact-line a {
+  color: #7c3aed;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.npd-contact-line a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 1200px) {
+  .npd-contractors-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .npd-layout {
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .npd-shell {
+    max-width: 100%;
+  }
+
+  .npd-sidebar {
+    width: 100%;
+    min-width: 0;
+    position: relative;
+    top: 0;
+    margin-bottom: 0;
+  }
+
+  .npd-main {
+    width: 100%;
+  }
+
+  .npd-state-checkboxes {
+    display: none;
+  }
+
+  .npd-state-dropdown {
+    display: block;
+    width: 100%;
+  }
+
+  .npd-state-dropdown select {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 14px 40px 14px 14px;
+    border-radius: 14px;
+    border: 1px solid #ddd;
+    background: #fff;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+
+  .npd-contractors-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    width: 100%;
+  }
+
+  .npd-contractor-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    max-width: 100%;
+    padding: 18px;
+    border-radius: 16px;
+    text-align: left;
+    box-sizing: border-box;
+  }
+
+  .npd-contractor-card img {
+    width: 100%;
+    height: 220px;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 12px;
+    margin-bottom: 14px;
+    background: #f8f8f8;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+
+  .npd-contractor-card h3 {
+    font-size: 17px;
+  }
+
+  .npd-contractor-card p {
+    font-size: 14px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const locationGroups = {
+    "illinois": {
+      label: "Illinois",
+      cities: ["chicago", "aurora", "naperville", "joliet", "rockford", "elgin"]
+    },
+    "new jersey": {
+      label: "New Jersey",
+      cities: ["newark", "jersey city", "paterson", "elizabeth", "edison"]
+    },
+    "new york": {
+      label: "New York",
+      cities: ["new york", "new york city", "buffalo", "rochester", "yonkers", "syracuse", "albany"]
+    },
+    "pennsylvania": {
+      label: "Pennsylvania",
+      cities: ["philadelphia", "pittsburgh", "allentown", "erie", "reading"]
+    },
+    "florida": {
+      label: "Florida",
+      cities: ["orlando", "miami", "tampa", "jacksonville", "st. petersburg", "fort lauderdale"]
+    }
+  };
+
+  const cards = Array.from(document.querySelectorAll(".npd-contractor-card"));
+  const urlParams = new URLSearchParams(window.location.search);
+  const tradeParam = (urlParams.get("trade") || "").toLowerCase().trim();
+
+  const checkboxContainer = document.getElementById("npd-state-checkboxes");
+  const mobileSelect = document.getElementById("npd-mobile-state-select");
+  const headingEl = document.getElementById("npd-directory-heading");
+
+  function normalize(value) {
+    return (value || "").toLowerCase().trim();
+  }
+
+  function titleCase(value) {
+    return (value || "")
+      .split(" ")
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
+  if (tradeParam && headingEl) {
+    headingEl.textContent = titleCase(tradeParam) + " Contractors";
+  }
+
+  function buildFilters() {
+    checkboxContainer.innerHTML = "";
+    mobileSelect.innerHTML = '<option value="all">All Locations</option>';
+
+    const allWrapper = document.createElement("label");
+    allWrapper.className = "npd-all-state";
+    allWrapper.innerHTML = `
+      <input type="checkbox" value="all" checked>
+      <span>All Locations</span>
+    `;
+    checkboxContainer.appendChild(allWrapper);
+
+    Object.entries(locationGroups).forEach(([stateKey, config], index) => {
+      const group = document.createElement("div");
+      group.className = "npd-filter-group" + (index === 0 ? " open" : "");
+      group.dataset.state = stateKey;
+
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "npd-filter-toggle";
+      toggle.innerHTML = `
+        <span class="npd-filter-toggle-text">
+          <input type="checkbox" class="npd-state-parent" value="${stateKey}">
+          <span>${config.label}</span>
+        </span>
+        <span class="npd-filter-toggle-icon">▼</span>
+      `;
+
+      const panel = document.createElement("div");
+      panel.className = "npd-filter-panel";
+
+      const citiesWrap = document.createElement("div");
+      citiesWrap.className = "npd-filter-cities";
+
+      config.cities.forEach(city => {
+        const cityId = `${stateKey}-${city}`.replace(/\s+/g, "-");
+
+        const cityLabel = document.createElement("label");
+        cityLabel.className = "npd-filter-city";
+        cityLabel.setAttribute("for", cityId);
+        cityLabel.innerHTML = `
+          <input id="${cityId}" type="checkbox" class="npd-city-child" data-state="${stateKey}" value="${city}">
+          <span>${titleCase(city)}</span>
+        `;
+        citiesWrap.appendChild(cityLabel);
+
+        const option = document.createElement("option");
+        option.value = `city:${city}`;
+        option.textContent = `${titleCase(city)}, ${config.label}`;
+        mobileSelect.appendChild(option);
+      });
+
+      panel.appendChild(citiesWrap);
+      group.appendChild(toggle);
+      group.appendChild(panel);
+      checkboxContainer.appendChild(group);
+
+      const stateOption = document.createElement("option");
+      stateOption.value = `state:${stateKey}`;
+      stateOption.textContent = config.label;
+      mobileSelect.appendChild(stateOption);
+    });
+  }
+
+  function getSelectedStates() {
+    return Array.from(
+      checkboxContainer.querySelectorAll(".npd-state-parent:checked")
+    ).map(input => normalize(input.value));
+  }
+
+  function getSelectedCities() {
+    return Array.from(
+      checkboxContainer.querySelectorAll(".npd-city-child:checked")
+    ).map(input => normalize(input.value));
+  }
+
+  function applyFilter(options = {}) {
+    const showAll = options.showAll || false;
+    const selectedStates = options.selectedStates || [];
+    const selectedCities = options.selectedCities || [];
+    const noResults = document.getElementById("npd-no-results");
+
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cardState = normalize(card.dataset.state);
+      const cardCity = normalize(card.dataset.city);
+      const cardTrade = normalize(card.dataset.category);
+
+      const matchAllowedState = !!locationGroups[cardState];
+
+      let matchLocation = true;
+
+      if (!showAll) {
+        if (selectedStates.length > 0 && selectedCities.length > 0) {
+          matchLocation =
+            selectedStates.includes(cardState) ||
+            selectedCities.includes(cardCity);
+        } else if (selectedStates.length > 0) {
+          matchLocation = selectedStates.includes(cardState);
+        } else if (selectedCities.length > 0) {
+          matchLocation = selectedCities.includes(cardCity);
+        }
+      }
+
+      const matchTrade = !tradeParam || cardTrade === tradeParam;     
+      const isVisible = matchAllowedState && matchLocation && matchTrade;
+
+      card.style.display = isVisible ? "" : "none";
+
+      if (isVisible) visibleCount++;
+    });
+      if (noResults) {
+        noResults.style.display = visibleCount === 0 ? "block" : "none";
+      }
+  }
+
+  function syncParentStates() {
+    const groups = checkboxContainer.querySelectorAll(".npd-filter-group");
+
+    groups.forEach(group => {
+      const stateParent = group.querySelector(".npd-state-parent");
+      const cityChildren = Array.from(group.querySelectorAll(".npd-city-child"));
+      const checkedChildren = cityChildren.filter(input => input.checked);
+
+      if (checkedChildren.length === 0) {
+        stateParent.checked = false;
+        stateParent.indeterminate = false;
+      } else if (checkedChildren.length === cityChildren.length) {
+        stateParent.checked = true;
+        stateParent.indeterminate = false;
+      } else {
+        stateParent.checked = false;
+        stateParent.indeterminate = true;
+      }
+    });
+  }
+
+  function clearAllSelections() {
+    checkboxContainer.querySelectorAll('input[type="checkbox"]').forEach(input => {
+      input.checked = false;
+      input.indeterminate = false;
+    });
+  }
+
+  buildFilters();
+
+  const allCheckbox = checkboxContainer.querySelector('input[value="all"]');
+
+  applyFilter({ showAll: true });
+
+  checkboxContainer.addEventListener("click", function (e) {
+    const toggle = e.target.closest(".npd-filter-toggle");
+    if (toggle && !e.target.matches('input[type="checkbox"]')) {
+      const group = toggle.closest(".npd-filter-group");
+      if (group) group.classList.toggle("open");
+    }
+  });
+
+  checkboxContainer.addEventListener("change", function (e) {
+    const target = e.target;
+
+    if (target.value === "all") {
+      if (target.checked) {
+        clearAllSelections();
+        allCheckbox.checked = true;
+        applyFilter({ showAll: true });
+      }
+      return;
+    }
+
+    allCheckbox.checked = false;
+
+    if (target.classList.contains("npd-state-parent")) {
+      const stateKey = normalize(target.value);
+      const group = checkboxContainer.querySelector(`.npd-filter-group[data-state="${stateKey}"]`);
+      const cityChildren = group ? group.querySelectorAll(`.npd-city-child[data-state="${stateKey}"]`) : [];
+
+      cityChildren.forEach(child => {
+        child.checked = target.checked;
+      });
+    }
+
+    syncParentStates();
+
+    const selectedStates = getSelectedStates();
+    const selectedCities = getSelectedCities();
+
+    if (selectedStates.length === 0 && selectedCities.length === 0) {
+      allCheckbox.checked = true;
+      applyFilter({ showAll: true });
+    } else {
+      applyFilter({
+        selectedStates,
+        selectedCities
+      });
+    }
+  });
+
+  mobileSelect.addEventListener("change", function () {
+    const value = this.value;
+
+    clearAllSelections();
+
+    if (value === "all") {
+      allCheckbox.checked = true;
+      applyFilter({ showAll: true });
+      return;
+    }
+
+    allCheckbox.checked = false;
+
+    if (value.startsWith("state:")) {
+      const stateKey = normalize(value.replace("state:", ""));
+      const group = checkboxContainer.querySelector(`.npd-filter-group[data-state="${stateKey}"]`);
+      const stateParent = group ? group.querySelector(`.npd-state-parent[value="${stateKey}"]`) : null;
+      const cityChildren = group ? group.querySelectorAll(`.npd-city-child[data-state="${stateKey}"]`) : [];
+
+      if (group) group.classList.add("open");
+      if (stateParent) stateParent.checked = true;
+
+      cityChildren.forEach(child => {
+        child.checked = true;
+      });
+
+      syncParentStates();
+
+      applyFilter({
+        selectedStates: [stateKey],
+        selectedCities: Array.from(cityChildren).map(child => normalize(child.value))
+      });
+      return;
+    }
+
+    if (value.startsWith("city:")) {
+      const cityValue = normalize(value.replace("city:", ""));
+      const cityCheckbox = checkboxContainer.querySelector(`.npd-city-child[value="${cityValue}"]`);
+
+      if (cityCheckbox) {
+        cityCheckbox.checked = true;
+        const group = cityCheckbox.closest(".npd-filter-group");
+        if (group) group.classList.add("open");
+      }
+
+      syncParentStates();
+
+      applyFilter({
+        selectedCities: [cityValue]
+      });
+    }
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "NPD Contractors Directory",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Find Contractors",
+      "label": "Heading"
+    }
+  ],
+  "presets": [
+    {
+      "name": "NPD Contractors Directory"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,1191 @@
+{% paginate shop.metaobjects.option.values by 250 %}
+{% assign options = shop.metaobjects.option.values | where: "active", true | sort: "sort_order" %}
+{% assign ordered_categories = "BASE/WALL Cabinets|TOP/WALL Cabinets|ISLAND/ACCENT Cabinets|QUARTZ Countertops|UNDER-MOUNT SINKS|HANDLES/KNOBS|HANDLES/KNOBS FOR DRAWERS" | split: "|" %}
+{% assign section_id = 'option-slider-' | append: section.id %}
+
+<div id="{{ section_id }}" class="option-slider-root">
+
+  <div class="schedule-container schedule-container-top">
+    <button class="schedule-service enabled" type="button">
+      SCHEDULE YOUR FREE BLUEPRINT
+    </button>
+  </div>
+
+  <div class="option-slider-section">
+    {% for category in ordered_categories %}
+      {% assign category_options = options | where: "category", category %}
+      {% if category_options.size > 0 %}
+        <div class="option-category">
+          <h2 class="option-category-title">{{ category }}</h2>
+
+          <div class="slider-container">
+            <button class="slider-btn prev" type="button" aria-label="Previous">‹</button>
+
+            <div class="option-slider">
+              {% for option in category_options %}
+                <div class="option-slide">
+                  <div class="option-card">
+                    {{ option.image | image_url: width: 500 | image_tag: alt: option.title, class: 'option-image', loading: 'lazy' }}
+                    <div class="option-title">{{ option.title }}</div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <button class="slider-btn next" type="button" aria-label="Next">›</button>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <div class="customer-notes-wrap">
+    <label for="customer-notes-{{ section.id }}">Customer Notes</label>
+    <textarea
+      id="customer-notes-{{ section.id }}"
+      class="customer-notes"
+      placeholder="Add any notes, preferences, measurements, questions, or special requests here..."
+      rows="5"
+    ></textarea>
+  </div>
+
+  <div class="schedule-container schedule-container-bottom">
+    <button class="schedule-service enabled" type="button">
+      SCHEDULE YOUR FREE BLUEPRINT
+    </button>
+  </div>
+
+  <div class="selection-summary">
+    <h3>Your Selection</h3>
+    <div class="summary-items"></div>
+  </div>
+
+  <form method="post" action="/contact#appointment-booking" class="appointment-form">
+    <input type="hidden" name="form_type" value="contact">
+    <input type="hidden" name="utf8" value="✓">
+    <input type="hidden" name="contact[tags]" value="appointment-booking">
+    <input type="hidden" name="contact[Selected Options]" class="selected-options">
+    <input type="hidden" name="contact[Appointment Date]" class="selected-date">
+    <input type="hidden" name="contact[Appointment Time]" class="selected-time">
+    <input type="hidden" name="contact[Recipient]" value="office@joevar.com">
+    <input type="hidden" name="contact[name]" class="hidden-customer-name">
+    <input type="hidden" name="contact[email]" class="hidden-customer-email">
+    <input type="hidden" name="contact[phone]" class="hidden-customer-phone">
+    <input type="hidden" name="contact[Customer Notes]" class="hidden-customer-notes">
+    <input type="hidden" name="contact[body]" class="hidden-message-body">
+  </form>
+
+  <div class="selection-confirm-modal hidden">
+    <div class="selection-confirm-overlay"></div>
+
+    <div class="selection-confirm-dialog">
+      <h3 class="selection-confirm-title"></h3>
+      <p class="selection-confirm-text"></p>
+
+      <div class="selection-confirm-actions">
+        <button type="button" class="selection-confirm-cancel">Cancel</button>
+        <button type="button" class="selection-confirm-primary">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="appointment-modal hidden">
+    <div class="appointment-modal-overlay"></div>
+
+    <div class="appointment-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="appointment-modal-title-{{ section.id }}">
+      <button type="button" class="appointment-modal-close" aria-label="Close">×</button>
+
+      <h3 id="appointment-modal-title-{{ section.id }}">Schedule Your Free Blueprint</h3>
+
+      <div class="modal-selection-preview">
+        <h4>Your selected options</h4>
+        <div class="modal-selection-list"></div>
+      </div>
+
+      <p class="appointment-modal-subtitle">Choose a date and time, then enter your details.</p>
+
+      <div class="appointment-modal-grid">
+        <div class="scheduler-field">
+          <label for="appointment-date-{{ section.id }}">Date</label>
+          <input type="date" id="appointment-date-{{ section.id }}" class="appointment-date-input" required>
+        </div>
+
+        <div class="scheduler-field">
+          <label for="appointment-time-{{ section.id }}">Time</label>
+          <select id="appointment-time-{{ section.id }}" class="appointment-time-input" required>
+            <option value="">Choose time</option>
+            <option value="09:00 AM">09:00 AM</option>
+            <option value="10:00 AM">10:00 AM</option>
+            <option value="11:00 AM">11:00 AM</option>
+            <option value="01:00 PM">01:00 PM</option>
+            <option value="02:00 PM">02:00 PM</option>
+            <option value="03:00 PM">03:00 PM</option>
+            <option value="04:00 PM">04:00 PM</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="appointment-modal-fields">
+        <div class="scheduler-field full">
+          <label for="customer-name-{{ section.id }}">Full Name</label>
+          <input type="text" id="customer-name-{{ section.id }}" class="customer-name" placeholder="Your full name" required>
+        </div>
+
+        <div class="scheduler-field full">
+          <label for="customer-email-{{ section.id }}">Email Address</label>
+          <input type="email" id="customer-email-{{ section.id }}" class="customer-email" placeholder="you@example.com" required>
+        </div>
+
+        <div class="scheduler-field full">
+          <label for="customer-phone-{{ section.id }}">Phone Number</label>
+          <input type="tel" id="customer-phone-{{ section.id }}" class="customer-phone" placeholder="Your phone number" required>
+        </div>
+      </div>
+
+      <div class="appointment-modal-actions">
+        <button type="button" class="book-appointment">Book Appointment</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="booking-success hidden">
+    <div class="booking-success-box">
+      <h3>Booking Confirmed</h3>
+      <p>
+        Thank you! Your appointment request has been sent successfully.<br>
+        We will be contacting you shortly to confirm the details.
+      </p>
+      <button type="button" class="close-success">Close</button>
+    </div>
+  </div>
+
+</div>
+{% endpaginate %}
+
+<style>
+.option-slider-section {
+  padding: 25px 20px;
+  max-width: 1400px;
+  margin: auto;
+  overflow: hidden;
+}
+
+.schedule-container {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.schedule-container-top {
+  margin: 30px auto 20px;
+  text-align: center;
+  max-width: 1400px;
+  padding: 0 20px;
+}
+
+.schedule-container-bottom {
+  margin: 20px auto 40px;
+  text-align: center;
+  max-width: 1400px;
+  padding: 0 20px;
+}
+
+.schedule-service {
+  padding: 14px 28px;
+  font-size: 16px;
+  border: none;
+  background: #16a34a;
+  color: white;
+  cursor: pointer;
+  opacity: 1;
+  transition: all .2s;
+  border-radius: 8px;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+.schedule-service.enabled {
+  opacity: 1;
+}
+
+.schedule-service.enabled:hover {
+  background: #15803d;
+}
+
+.option-category {
+  margin-bottom: 32px;
+}
+
+.option-category-title {
+  font-size: 20px;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.option-slider {
+  display: flex;
+  gap: 12px;
+  overflow: hidden;
+  scroll-behavior: smooth;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.option-slide {
+  flex: 0 0 calc(25% - 9px);
+  cursor: pointer;
+  padding: 3px;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option-card {
+  min-height: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: white;
+  border: 2px solid transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: border-color .12s ease, box-shadow .12s ease, transform .12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option-image {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  object-position: center;
+  display: block;
+  background: #fff;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option-title {
+  padding: 10px;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.option-slide.selected .option-card {
+  border-color: #000;
+  box-shadow: 0 0 0 2px #000;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: white;
+  border: none;
+  font-size: 24px;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.prev {
+  left: -10px;
+}
+
+.next {
+  right: -10px;
+}
+
+.customer-notes-wrap {
+  max-width: 1400px;
+  margin: 10px auto 50px;
+  padding: 0 20px;
+}
+
+.customer-notes-wrap label {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.customer-notes {
+  width: 100%;
+  min-height: 130px;
+  padding: 14px 16px;
+  border: 1px solid #d8d8d8;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 15px;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.customer-notes:focus {
+  border-color: #16a34a;
+}
+
+.selection-summary {
+  margin-top: 60px;
+  padding-top: 30px;
+  border-top: 1px solid #ddd;
+}
+
+.selection-summary h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.summary-items {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 120px;
+}
+
+.summary-item img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+}
+
+.summary-title {
+  font-size: 13px;
+  margin-top: 6px;
+  text-align: center;
+}
+
+/* Modal visibility */
+
+.appointment-modal.hidden,
+.booking-success.hidden,
+.selection-confirm-modal.hidden {
+  display: none;
+}
+
+/* Appointment modal */
+
+.appointment-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow-y: auto;
+  padding: 20px 0;
+}
+
+.appointment-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+}
+
+.appointment-modal-dialog {
+  position: relative;
+  width: min(92vw, 560px);
+  max-height: calc(100vh - 40px);
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  z-index: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.appointment-modal-close {
+  position: sticky;
+  top: 0;
+  margin-left: auto;
+  display: block;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: #f3f3f3;
+  color: #111;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.appointment-modal-dialog h3 {
+  margin-top: 4px;
+}
+
+.appointment-modal-subtitle {
+  margin: 0 0 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.appointment-modal-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.appointment-modal-fields {
+  display: grid;
+  gap: 14px;
+}
+
+.scheduler-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.scheduler-field label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.scheduler-field input,
+.scheduler-field select {
+  padding: 13px 14px;
+  font-size: 14px;
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  background: #fff;
+  outline: none;
+}
+
+.scheduler-field input:focus,
+.scheduler-field select:focus {
+  border-color: #16a34a;
+}
+
+.scheduler-field.full {
+  grid-column: 1 / -1;
+}
+
+.appointment-modal-actions {
+  margin-top: 20px;
+}
+
+.book-appointment {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: #16a34a;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 12px;
+  transition: all .2s;
+}
+
+.book-appointment:hover,
+.close-success:hover {
+  background: #15803d;
+}
+
+.book-appointment.loading {
+  opacity: .7;
+  pointer-events: none;
+}
+
+/* Selected options inside modal */
+
+.modal-selection-preview {
+  margin-bottom: 18px;
+  padding: 14px;
+  background: #f7f7f7;
+  border-radius: 12px;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.modal-selection-preview h4 {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modal-selection-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.modal-selection-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e2e2;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* Success modal */
+
+.booking-success {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.booking-success-box {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+
+.close-success {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  background: #16a34a;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Confirmation modal */
+
+.selection-confirm-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+}
+
+.selection-confirm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+}
+
+.selection-confirm-dialog {
+  position: relative;
+  z-index: 2;
+  width: min(92vw, 460px);
+  margin: 120px auto;
+  background: #fff;
+  border-radius: 18px;
+  padding: 26px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+}
+
+.selection-confirm-title {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.selection-confirm-text {
+  margin: 0 0 22px;
+  color: #555;
+}
+
+.selection-confirm-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.selection-confirm-actions button {
+  flex: 1;
+  padding: 13px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.selection-confirm-cancel {
+  background: #f3f3f3;
+  border: 1px solid #ddd;
+  color: #111;
+}
+
+.selection-confirm-primary {
+  background: #16a34a;
+  border: 1px solid #16a34a;
+  color: #fff;
+}
+
+/* Desktop hover */
+
+@media (min-width: 769px) {
+  .option-card {
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+
+  .option-slide:hover .option-card {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.14);
+  }
+}
+
+/* Responsive slider widths */
+
+@media(max-width: 1100px) {
+  .option-slide {
+    flex: 0 0 calc(33.33% - 12px);
+  }
+}
+
+@media(max-width: 800px) {
+  .option-slide {
+    flex: 0 0 calc(50% - 10px);
+  }
+}
+
+
+/* Mobile slider tap fixes */
+
+@media (max-width: 768px) {
+  .slider-container {
+    padding: 0 44px;
+    touch-action: pan-y;
+  }
+
+  .slider-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 56px;
+    z-index: 20;
+    border-radius: 12px;
+    opacity: 0.95;
+    touch-action: manipulation;
+  }
+
+  .prev {
+    left: 2px;
+  }
+
+  .next {
+    right: 2px;
+  }
+
+  .option-slider {
+    gap: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x pan-y;
+    padding-bottom: 12px;
+    scroll-padding-left: 0;
+  }
+
+  .option-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .option-slide {
+    flex: 0 0 100%;
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    cursor: pointer;
+    padding: 3px;
+    box-sizing: border-box;
+    touch-action: pan-x pan-y;
+  }
+
+  .option-card {
+    touch-action: pan-x pan-y;
+  }
+
+  .option-image {
+    touch-action: pan-x pan-y;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  .option-title {
+    touch-action: manipulation;
+  }
+
+}
+/* Mobile modal fix */
+
+@media(max-width:640px){
+  .appointment-modal {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 12px 0 90px;
+    height: 100dvh;
+    max-height: 100dvh;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .appointment-modal-dialog{
+    width: calc(100vw - 24px);
+    max-height: none;
+    min-height: auto;
+    margin: 0 auto 90px;
+    padding: 18px;
+    overflow: visible;
+  }
+
+  .appointment-modal-grid{
+    grid-template-columns:1fr;
+  }
+
+  .modal-selection-preview {
+    max-height: 120px;
+    overflow-y: auto;
+  }
+
+  .modal-selection-list {
+    max-height: 82px;
+    overflow-y: auto;
+  }
+
+  .modal-selection-chip {
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+
+  .appointment-modal-actions {
+    margin-top: 20px;
+    position: static;
+  }
+}
+</style>
+
+<script>
+(function() {
+  var root = document.getElementById('{{ section_id }}');
+  if (!root) return;
+  if (root.dataset.initialized === 'true') return;
+  root.dataset.initialized = 'true';
+
+  var summaryContainer = root.querySelector('.summary-items');
+  var bookingModal = root.querySelector('.appointment-modal');
+  var bookingOverlay = root.querySelector('.appointment-modal-overlay');
+  var bookingClose = root.querySelector('.appointment-modal-close');
+  var successModal = root.querySelector('.booking-success');
+  var successClose = root.querySelector('.close-success');
+  var form = root.querySelector('.appointment-form');
+  var bookButton = root.querySelector('.book-appointment');
+
+  function openModal() {
+    updateModalSelections();
+    bookingModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+
+    var dialog = root.querySelector('.appointment-modal-dialog');
+    if (dialog) {
+      dialog.scrollTop = 0;
+    }
+  }
+
+  function closeModal() {
+    bookingModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  function openSuccess() {
+    successModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeSuccess() {
+    successModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  function updateSummary() {
+    summaryContainer.innerHTML = '';
+
+    root.querySelectorAll('.option-category').forEach(function(category) {
+      var selected = category.querySelector('.option-slide.selected');
+      if (!selected) return;
+
+      var img = selected.querySelector('img');
+      var title = selected.querySelector('.option-title').innerText;
+
+      var item = document.createElement('div');
+      item.className = 'summary-item';
+      item.innerHTML =
+        '<img src="' + (img ? img.src : '') + '" alt="' + title.replace(/"/g, '&quot;') + '">' +
+        '<div class="summary-title">' + title + '</div>';
+
+      summaryContainer.appendChild(item);
+    });
+  }
+
+  function updateModalSelections() {
+    var container = root.querySelector('.modal-selection-list');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    root.querySelectorAll('.option-category').forEach(function(cat) {
+      var selected = cat.querySelector('.option-slide.selected');
+      if (!selected) return;
+
+      var title = selected.querySelector('.option-title').innerText;
+      var chip = document.createElement('div');
+      chip.className = 'modal-selection-chip';
+      chip.textContent = title;
+      container.appendChild(chip);
+    });
+
+    if (!container.children.length) {
+      var chip = document.createElement('div');
+      chip.className = 'modal-selection-chip';
+      chip.textContent = 'No kitchen items selected';
+      container.appendChild(chip);
+    }
+  }
+
+  function clearSelectionsAfterSuccess() {
+    root.querySelectorAll('.option-slide.selected').forEach(function(slide) {
+      slide.classList.remove('selected');
+    });
+
+    summaryContainer.innerHTML = '';
+
+    var notesField = root.querySelector('.customer-notes');
+    if (notesField) {
+      notesField.value = '';
+    }
+  }
+
+  root.querySelectorAll('.slider-container').forEach(function(container) {
+    var slider = container.querySelector('.option-slider');
+    var next = container.querySelector('.next');
+    var prev = container.querySelector('.prev');
+
+    if (!slider) return;
+
+    var currentIndex = 0;
+    var isAnimating = false;
+
+    function getSlides() {
+      return Array.prototype.slice.call(slider.querySelectorAll('.option-slide'));
+    }
+
+    function getSlideLeft(slide) {
+      return slide.offsetLeft - slider.offsetLeft;
+    }
+
+    function syncIndexFromScroll() {
+      var slides = getSlides();
+      if (!slides.length) return;
+
+      var closestIndex = 0;
+      var closestDistance = Infinity;
+
+      slides.forEach(function(slide, index) {
+        var distance = Math.abs(getSlideLeft(slide) - slider.scrollLeft);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      currentIndex = closestIndex;
+    }
+
+    function scrollToIndex(index, behavior) {
+      var slides = getSlides();
+      if (!slides.length) return;
+
+      var maxIndex = slides.length - 1;
+      currentIndex = Math.max(0, Math.min(index, maxIndex));
+
+      slider.scrollTo({
+        left: getSlideLeft(slides[currentIndex]),
+        behavior: behavior || 'smooth'
+      });
+    }
+
+    if (next) {
+      next.addEventListener('click', function() {
+        if (isAnimating) return;
+
+        syncIndexFromScroll();
+        isAnimating = true;
+        scrollToIndex(currentIndex + 1, 'smooth');
+
+        window.setTimeout(function() {
+          scrollToIndex(currentIndex, 'auto');
+          isAnimating = false;
+        }, 380);
+      });
+    }
+
+    if (prev) {
+      prev.addEventListener('click', function() {
+        if (isAnimating) return;
+
+        syncIndexFromScroll();
+        isAnimating = true;
+        scrollToIndex(currentIndex - 1, 'smooth');
+
+        window.setTimeout(function() {
+          scrollToIndex(currentIndex, 'auto');
+          isAnimating = false;
+        }, 380);
+      });
+    }
+
+    slider.addEventListener('scroll', function() {
+      window.clearTimeout(slider._snapTimer);
+
+      slider._snapTimer = window.setTimeout(function() {
+        syncIndexFromScroll();
+        scrollToIndex(currentIndex, 'auto');
+      }, 140);
+    }, { passive: true });
+  });
+
+  function selectOptionSlide(slide) {
+    var categoryBlock = slide.closest('.option-category');
+    if (!categoryBlock) return;
+
+    var alreadySelected = slide.classList.contains('selected');
+
+    categoryBlock.querySelectorAll('.option-slide').forEach(function(s) {
+      s.classList.remove('selected');
+    });
+
+    if (!alreadySelected) {
+      slide.classList.add('selected');
+    }
+
+    updateSummary();
+  }
+
+  root.querySelectorAll('.option-slide').forEach(function(slide) {
+    slide.addEventListener('click', function() {
+      selectOptionSlide(slide);
+    });
+  });
+
+  var scheduleButtons = root.querySelectorAll('.schedule-service');
+  var confirmModal = root.querySelector('.selection-confirm-modal');
+  var confirmTitle = root.querySelector('.selection-confirm-title');
+  var confirmText = root.querySelector('.selection-confirm-text');
+  var confirmCancel = root.querySelector('.selection-confirm-cancel');
+  var confirmPrimary = root.querySelector('.selection-confirm-primary');
+  var confirmOverlay = root.querySelector('.selection-confirm-overlay');
+
+  function openConfirmModal(title, text, onContinue) {
+    confirmTitle.textContent = title;
+    confirmText.textContent = text;
+    confirmModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+
+    confirmPrimary.onclick = function() {
+      confirmModal.classList.add('hidden');
+      document.body.classList.remove('modal-open');
+      onContinue();
+    };
+  }
+
+  function closeConfirmModal() {
+    confirmModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  confirmCancel.addEventListener('click', closeConfirmModal);
+
+  if (confirmOverlay) {
+    confirmOverlay.addEventListener('click', closeConfirmModal);
+  }
+
+  scheduleButtons.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var selectedCount = root.querySelectorAll('.option-slide.selected').length;
+
+      if (selectedCount == 7) {
+        openConfirmModal(
+          'Reselect Kitchen Items?',
+          'Would you like to reselect your kitchen items before scheduling your free blueprint?',
+          function() {
+            root.querySelector('.option-slider-section').scrollIntoView({
+              behavior: 'smooth',
+              block: 'start'
+            });
+          }
+        );
+
+        confirmPrimary.textContent = 'Continue Booking';
+        confirmCancel.textContent = 'Reselect Items';
+
+        confirmPrimary.onclick = function() {
+          closeConfirmModal();
+          openModal();
+        };
+
+        confirmCancel.onclick = function() {
+          closeConfirmModal();
+
+          root.querySelector('.option-slider-section').scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+
+        return;
+      }
+
+      openConfirmModal(
+        'Continue Without Selections?',
+        'Would you like to continue without selecting the kitchen items?',
+        function() {
+          openModal();
+        }
+      );
+
+      confirmPrimary.textContent = 'Continue';
+      confirmCancel.textContent = 'Cancel';
+      confirmCancel.onclick = closeConfirmModal;
+    });
+  });
+
+  bookingClose.addEventListener('click', closeModal);
+  bookingOverlay.addEventListener('click', closeModal);
+  successClose.addEventListener('click', closeSuccess);
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !bookingModal.classList.contains('hidden')) {
+      closeModal();
+    }
+
+    if (e.key === 'Escape' && !successModal.classList.contains('hidden')) {
+      closeSuccess();
+    }
+
+    if (e.key === 'Escape' && !confirmModal.classList.contains('hidden')) {
+      closeConfirmModal();
+    }
+  });
+
+  var dateInput = root.querySelector('.appointment-date-input');
+  if (dateInput) {
+    var today = new Date();
+    var yyyy = today.getFullYear();
+    var mm = String(today.getMonth() + 1).padStart(2, '0');
+    var dd = String(today.getDate()).padStart(2, '0');
+    dateInput.min = yyyy + '-' + mm + '-' + dd;
+  }
+
+  bookButton.addEventListener('click', function(ev) {
+    ev.preventDefault();
+
+    var selections = [];
+    root.querySelectorAll('.option-category').forEach(function(cat) {
+      var s = cat.querySelector('.option-slide.selected');
+      if (s) {
+        selections.push(s.querySelector('.option-title').innerText || '');
+      }
+    });
+
+    var dateField = root.querySelector('.appointment-date-input');
+    var timeField = root.querySelector('.appointment-time-input');
+    var nameField = root.querySelector('.customer-name');
+    var emailField = root.querySelector('.customer-email');
+    var phoneField = root.querySelector('.customer-phone');
+    var notesField = root.querySelector('.customer-notes');
+
+    if (!dateField || !timeField || !nameField || !emailField || !phoneField) {
+      alert('Missing fields');
+      return;
+    }
+
+    if (
+      !dateField.checkValidity() ||
+      !timeField.checkValidity() ||
+      !nameField.checkValidity() ||
+      !emailField.checkValidity() ||
+      !phoneField.checkValidity()
+    ) {
+      dateField.reportValidity();
+      timeField.reportValidity();
+      nameField.reportValidity();
+      emailField.reportValidity();
+      phoneField.reportValidity();
+      return;
+    }
+
+    var selectedOptionsText = selections.length ? selections.join(', ') : 'No kitchen items selected';
+
+    form.querySelector('.selected-options').value = selectedOptionsText;
+    form.querySelector('.selected-date').value = dateField.value;
+    form.querySelector('.selected-time').value = timeField.value;
+    form.querySelector('.hidden-customer-name').value = nameField.value.trim();
+    form.querySelector('.hidden-customer-email').value = emailField.value.trim();
+    form.querySelector('.hidden-customer-phone').value = phoneField.value.trim();
+    form.querySelector('.hidden-customer-notes').value = customerNotes || 'No notes provided';
+
+    form.querySelector('.hidden-message-body').value =
+      'Free blueprint appointment request details:\n\n' +
+      'Name: ' + nameField.value.trim() + '\n' +
+      'Email: ' + emailField.value.trim() + '\n' +
+      'Phone: ' + phoneField.value.trim() + '\n' +
+      'Selected Kitchen Items: ' + selectedOptionsText + '\n' +
+      'Customer Notes: ' + (customerNotes || 'No notes provided') + '\n' +
+      'Appointment Date: ' + dateField.value + '\n' +
+      'Appointment Time: ' + timeField.value;
+
+    closeModal();
+    clearSelectionsAfterSuccess();
+    openSuccess();
+
+    if (window.Shopify && Shopify.designMode) {
+      return;
+    }
+
+    setTimeout(function() {
+      form.submit();
+    }, 300);
+
+  });
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Option Metaobject Slider",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Option Metaobject Slider"
+    }
+  ]
+}
+{% endschema %}

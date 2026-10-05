@@ -1,0 +1,229 @@
+<section class="npd-services">
+  <div class="page-width">
+
+    {% if section.settings.heading != blank %}
+      <div class="npd-services__header">
+        <h2>{{ section.settings.heading }}</h2>
+        {% if section.settings.subheading != blank %}
+          <p>{{ section.settings.subheading }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="npd-services__grid">
+      {% for block in section.blocks %}
+
+        {% assign card_url = block.settings.custom_link %}
+
+        {% if block.settings.collection != blank %}
+          {% assign card_url = block.settings.collection.url %}
+        {% endif %}
+
+        {% if card_url == blank %}
+          {% assign card_url = '#' %}
+        {% endif %}
+
+        <a
+          class="npd-service-card"
+          href="{{ card_url }}"
+          {{ block.shopify_attributes }}
+        >
+
+          <div class="npd-service-card__top">
+            <h3 class="npd-service-card__title">
+              {{ block.settings.title }}
+            </h3>
+
+            {% if block.settings.subtitle != blank %}
+              <p class="npd-service-card__subtitle">
+                {{ block.settings.subtitle }}
+              </p>
+            {% endif %}
+          </div>
+
+          <div class="npd-service-card__jobs">
+            {% if block.settings.jobs != blank %}
+              {{ block.settings.jobs }}
+            {% else %}
+              <ul>
+                <li>{{ block.settings.title }}</li>
+              </ul>
+            {% endif %}
+          </div>
+
+          <div class="npd-service-card__cta">
+            <span>{{ section.settings.cta_label }}</span>
+            <span>→</span>
+          </div>
+
+        </a>
+
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<style>
+.npd-services {
+  padding: 70px 0;
+}
+
+.npd-services__header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.npd-services__header h2 {
+  margin: 0 0 10px 0;
+  font-size: 36px;
+}
+
+.npd-services__header p {
+  margin: 0;
+  color: #666;
+  font-size: 16px;
+}
+
+.npd-services__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+
+.npd-service-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+.npd-service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.10);
+}
+
+.npd-service-card__title {
+  margin: 0;
+  font-size: 18px;
+}
+
+.npd-service-card__subtitle {
+  margin: 6px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.npd-service-card__jobs {
+  color: #555;
+  line-height: 1.55;
+  font-size: 14px;
+}
+
+.npd-service-card__jobs ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.npd-service-card__cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+@media (max-width: 1024px) {
+  .npd-services__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .npd-services {
+    padding: 50px 0;
+  }
+
+  .npd-services__header h2 {
+    font-size: 28px;
+  }
+
+  .npd-services__grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "NPD Contractor Services",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Contractor Services"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Choose a service to view available contractors."
+    },
+    {
+      "type": "text",
+      "id": "cta_label",
+      "label": "Card CTA label",
+      "default": "View collection"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service card",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Card title",
+          "default": "Plumbing"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitle (optional)",
+          "default": "Optional subtitle"
+        },
+        {
+          "type": "richtext",
+          "id": "jobs",
+          "label": "Jobs list"
+        },
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Collection page"
+        },
+        {
+          "type": "url",
+          "id": "custom_link",
+          "label": "Custom link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "NPD Contractor Services"
+    }
+  ]
+}
+{% endschema %}

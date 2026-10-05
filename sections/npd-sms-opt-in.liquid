@@ -1,0 +1,880 @@
+{% comment %}
+  SMS Opt-In
+  Shopify Horizon
+
+  POST endpoint:
+  /api/sms/opt-in
+
+  Sends:
+  - PhoneNumber
+  - Consent
+  - ConsentTimestamp
+  - ConsentSource
+  - ConsentVersion
+  - ConsentText
+
+  IMPORTANT:
+  - Set "Sender Name" in the theme editor to the EXACT name on your
+    Twilio brand registration (e.g. your full legal name for a
+    Sole Proprietor brand). It is used everywhere on this form.
+  - The ASP.NET backend must store the consent fields
+    if you want persistent proof of consent.
+{% endcomment %}
+
+{%- assign sender = section.settings.sender_name | default: 'Joseph Konney' | strip -%}
+
+{%- capture consent_text -%}I agree to receive SMS messages from {{ sender }} regarding appointments, scheduling, project updates, crew arrival notifications, permit/inspection updates, and other service-related communications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for assistance. Consent is not a condition of purchase. See our Privacy Policy and Terms of Service.{%- endcapture -%}
+
+<section
+  id="sms-opt-in-{{ section.id }}"
+  class="joevar-sms-section"
+>
+
+  <div class="joevar-sms-container">
+
+    <div class="joevar-sms-card">
+
+      {% if section.settings.heading != blank %}
+        <h1 class="joevar-sms-heading">
+          {{ section.settings.heading }}
+        </h1>
+      {% endif %}
+
+      <div class="joevar-sms-subheading">
+        <p>Enter your mobile number to receive service and project-related text messages from {{ sender | escape }}.</p>
+      </div>
+
+
+      <form
+        id="sms-optin-form-{{ section.id }}"
+        class="joevar-sms-form"
+        data-endpoint="{{ section.settings.endpoint_url | escape }}"
+        novalidate
+      >
+
+        <!-- PHONE -->
+
+        <div class="joevar-field">
+
+          <label for="sms-phone-{{ section.id }}">
+            Mobile Phone Number
+          </label>
+
+          <input
+            id="sms-phone-{{ section.id }}"
+            name="phone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="+1 312 555 1234"
+            required
+          >
+
+          <small>
+            Signing up for text messages is optional. You can book an appointment and receive our services without agreeing to receive SMS messages.
+          </small>
+
+        </div>
+
+
+        <!-- CONSENT (unchecked by default) -->
+
+        <div class="joevar-consent-box">
+
+          <label class="joevar-checkbox-label">
+
+            <input
+              id="sms-consent-{{ section.id }}"
+              type="checkbox"
+              name="sms_consent"
+              value="yes"
+            >
+
+            <span class="joevar-consent-text">
+              (Optional)
+              I agree to receive SMS messages from
+              <strong>{{ sender | escape }}</strong> regarding appointments,
+              scheduling, project updates, crew arrival notifications,
+              permit/inspection updates, and other service-related
+              communications.
+
+              Message frequency varies. Message and data rates may apply.
+
+              Reply <strong>STOP</strong> to opt out or
+              <strong>HELP</strong> for assistance.
+
+              Consent is not a condition of purchase.
+
+              See our
+              <a
+                href="/policies/privacy-policy"
+                target="_blank"
+                rel="noopener"
+              >Privacy Policy</a>
+              and
+              <a
+                href="/policies/terms-of-service"
+                target="_blank"
+                rel="noopener"
+              >Terms of Service</a>.
+
+            </span>
+
+          </label>
+
+        </div>
+
+
+        <!-- SUBMIT -->
+
+        <button
+          id="sms-submit-{{ section.id }}"
+          type="submit"
+          class="joevar-sms-button"
+        >
+          {{ section.settings.button_text }}
+        </button>
+
+
+        <!-- DATA NOTE -->
+
+        <p class="joevar-sms-note">
+          Your mobile number and SMS consent will not be sold or shared with third parties for marketing purposes.
+        </p>
+
+
+        <!-- RESPONSE -->
+
+        <div
+          id="sms-message-{{ section.id }}"
+          class="joevar-sms-message"
+          role="status"
+          aria-live="polite"
+        ></div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<style>
+
+  #sms-opt-in-{{ section.id }} {
+    background: {{ section.settings.background_color }};
+    padding: 60px 20px;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-container {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-card {
+    background: #ffffff;
+
+    border: 1px solid #e4e4e4;
+    border-top: 5px solid {{ section.settings.green_color }};
+
+    border-radius: 14px;
+
+    padding: 42px;
+
+    box-shadow:
+      0 8px 28px rgba(0, 0, 0, 0.06);
+  }
+
+
+  /* HEADING */
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-heading {
+    margin: 0 0 12px;
+
+    color: {{ section.settings.green_color }};
+
+    text-align: center;
+
+    font-size: 34px;
+    line-height: 1.15;
+    font-weight: 700;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-subheading {
+    max-width: 580px;
+
+    margin: 0 auto 32px;
+
+    text-align: center;
+
+    font-size: 16px;
+    line-height: 1.6;
+
+    color: #555555;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-subheading p {
+    margin: 0;
+  }
+
+
+  /* PHONE */
+
+  #sms-opt-in-{{ section.id }} .joevar-field {
+    margin-bottom: 24px;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-field label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: {{ section.settings.green_color }};
+
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-field input {
+    display: block;
+
+    width: 100%;
+    min-height: 54px;
+
+    box-sizing: border-box;
+
+    padding: 12px 15px;
+
+    background: #ffffff;
+    color: #111111;
+
+    border: 1px solid #cccccc;
+    border-radius: 8px;
+
+    font-size: 16px;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-field input:focus {
+    outline: 3px solid {{ section.settings.green_color }}20;
+    border-color: {{ section.settings.green_color }};
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-field small {
+    display: block;
+
+    margin-top: 7px;
+
+    color: #777777;
+
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+
+  /* CONSENT */
+
+  #sms-opt-in-{{ section.id }} .joevar-consent-box {
+    padding: 20px;
+
+    background: {{ section.settings.green_color }}0D;
+
+    border: 1px solid {{ section.settings.green_color }}40;
+    border-radius: 10px;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 14px;
+
+    cursor: pointer;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-checkbox-label input {
+    width: 21px;
+    height: 21px;
+    min-width: 21px;
+
+    margin-top: 3px;
+
+    accent-color: {{ section.settings.green_color }};
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-consent-text {
+    color: #333333;
+
+    font-size: 13px;
+    line-height: 1.75;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-consent-text strong {
+    color: #111111;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-consent-text a {
+    color: {{ section.settings.green_color }};
+
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+
+  /* BUTTON */
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-button {
+    display: block;
+
+    width: 100%;
+    min-height: 55px;
+
+    margin-top: 28px;
+
+    padding: 14px 20px;
+
+    background: {{ section.settings.green_color }};
+    color: #ffffff;
+
+    border: none;
+    border-radius: 8px;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s ease;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-button:hover {
+    opacity: 0.9;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-button:active {
+    transform: scale(0.99);
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+
+  /* DATA NOTE */
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-note {
+    margin: 14px 0 0;
+
+    text-align: center;
+
+    color: #777777;
+
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+
+  /* MESSAGES */
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-message {
+    display: none;
+
+    margin-top: 18px;
+    padding: 14px 16px;
+
+    border-radius: 8px;
+
+    text-align: center;
+
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-message.success {
+    display: block;
+
+    background: #edf8f1;
+    color: #176b3a;
+
+    border: 1px solid #9bcaae;
+  }
+
+
+  #sms-opt-in-{{ section.id }} .joevar-sms-message.error {
+    display: block;
+
+    background: #fff1f1;
+    color: #991b1b;
+
+    border: 1px solid #e3aaaa;
+  }
+
+
+  /* MOBILE */
+
+  @media screen and (max-width: 749px) {
+
+    #sms-opt-in-{{ section.id }} {
+      padding: 35px 15px;
+    }
+
+
+    #sms-opt-in-{{ section.id }} .joevar-sms-card {
+      padding: 26px 20px;
+      border-radius: 12px;
+    }
+
+
+    #sms-opt-in-{{ section.id }} .joevar-sms-heading {
+      font-size: 28px;
+    }
+
+
+    #sms-opt-in-{{ section.id }} .joevar-sms-subheading {
+      font-size: 15px;
+    }
+
+
+    #sms-opt-in-{{ section.id }} .joevar-consent-box {
+      padding: 17px;
+    }
+
+
+    #sms-opt-in-{{ section.id }} .joevar-consent-text {
+      font-size: 12.5px;
+      line-height: 1.7;
+    }
+
+  }
+
+</style>
+
+
+<script>
+
+(function() {
+
+  const form =
+    document.getElementById(
+      'sms-optin-form-{{ section.id }}'
+    );
+
+
+  if (!form) {
+    return;
+  }
+
+
+  const phoneInput =
+    document.getElementById(
+      'sms-phone-{{ section.id }}'
+    );
+
+
+  const consentInput =
+    document.getElementById(
+      'sms-consent-{{ section.id }}'
+    );
+
+
+  const submitButton =
+    document.getElementById(
+      'sms-submit-{{ section.id }}'
+    );
+
+
+  const messageBox =
+    document.getElementById(
+      'sms-message-{{ section.id }}'
+    );
+
+
+  const endpoint =
+    form.dataset.endpoint;
+
+
+  /*
+    Generated from the same Liquid text as the
+    wording displayed above, so they always match.
+  */
+
+  const consentText =
+    {{ consent_text | json }};
+
+
+  const consentVersion =
+    {{ section.settings.consent_version | json }};
+
+
+  function showMessage(type, message) {
+
+    messageBox.className =
+      'joevar-sms-message ' + type;
+
+    messageBox.textContent =
+      message;
+
+  }
+
+
+  /*
+    Convert:
+    +1 (312) 555-1234
+
+    To:
+    +13125551234
+  */
+
+  function normalizePhone(phone) {
+
+    const trimmed =
+      phone.trim();
+
+
+    if (!trimmed.startsWith('+')) {
+      return null;
+    }
+
+
+    return (
+      '+' +
+      trimmed
+        .substring(1)
+        .replace(/\D/g, '')
+    );
+
+  }
+
+
+  function isValidE164(phone) {
+
+    return /^\+[1-9]\d{7,14}$/.test(phone);
+
+  }
+
+
+  form.addEventListener(
+    'submit',
+    async function(event) {
+
+      event.preventDefault();
+
+
+      messageBox.className =
+        'joevar-sms-message';
+
+      messageBox.textContent =
+        '';
+
+
+      /* CONSENT CHECK */
+
+      if (!consentInput.checked) {
+
+        showMessage(
+          'error',
+          'Please check the box to agree to receive SMS messages before submitting.'
+        );
+
+        return;
+
+      }
+
+
+      /* PHONE */
+
+      const phone =
+        normalizePhone(
+          phoneInput.value
+        );
+
+
+      if (!phone || !isValidE164(phone)) {
+
+        showMessage(
+          'error',
+          'Please enter your phone number including country code. Example: +1 312 555 1234'
+        );
+
+        phoneInput.focus();
+
+        return;
+
+      }
+
+
+      phoneInput.value =
+        phone;
+
+
+      /* ENDPOINT */
+
+      if (!endpoint) {
+
+        showMessage(
+          'error',
+          'The SMS service has not been configured.'
+        );
+
+        return;
+
+      }
+
+
+      /*
+        CONSENT PROOF
+      */
+
+      const payload = {
+
+        PhoneNumber:
+          phone,
+
+        Consent:
+          true,
+
+        ConsentTimestamp:
+          new Date().toISOString(),
+
+        ConsentSource:
+          window.location.href,
+
+        ConsentVersion:
+          consentVersion,
+
+        ConsentText:
+          consentText
+
+      };
+
+
+      submitButton.disabled =
+        true;
+
+
+      const originalButtonText =
+        submitButton.textContent;
+
+
+      submitButton.textContent =
+        'Submitting...';
+
+
+      try {
+
+        const response =
+          await fetch(
+            endpoint,
+            {
+              method: 'POST',
+
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+
+              body:
+                JSON.stringify(payload)
+            }
+          );
+
+
+        if (response.ok) {
+
+          showMessage(
+            'success',
+            {{ section.settings.success_message | json }}
+          );
+
+
+          form.reset();
+
+          return;
+
+        }
+
+
+        /*
+          ERROR FROM ASP.NET
+        */
+
+        let errorMessage =
+          'We could not process your SMS opt-in. Please try again.';
+
+
+        try {
+
+          const error =
+            await response.json();
+
+
+          if (error.detail) {
+
+            errorMessage =
+              error.detail;
+
+          } else if (error.title) {
+
+            errorMessage =
+              error.title;
+
+          }
+
+
+          if (
+            error.errors &&
+            error.errors.PhoneNumber &&
+            error.errors.PhoneNumber.length
+          ) {
+
+            errorMessage =
+              error.errors.PhoneNumber[0];
+
+          }
+
+        } catch (parseError) {
+
+          console.error(
+            'Could not parse API response.',
+            parseError
+          );
+
+        }
+
+
+        showMessage(
+          'error',
+          errorMessage
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          'SMS opt-in request failed:',
+          error
+        );
+
+
+        showMessage(
+          'error',
+          'We could not connect to the SMS service. Please try again.'
+        );
+
+      } finally {
+
+        submitButton.disabled =
+          false;
+
+
+        submitButton.textContent =
+          originalButtonText;
+
+      }
+
+    }
+  );
+
+})();
+
+</script>
+
+
+{% schema %}
+{
+  "name": "SMS Opt-In",
+  "tag": "section",
+  "class": "section-joevar-sms",
+
+  "settings": [
+
+    {
+      "type": "text",
+      "id": "sender_name",
+      "label": "Sender Name",
+      "default": "[Your Full Name]",
+      "info": "Must exactly match the name on your Twilio A2P brand registration. Used in the description, consent text and stored consent proof."
+    },
+
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Stay Updated by Text"
+    },
+
+    {
+      "type": "text",
+      "id": "endpoint_url",
+      "label": "ASP.NET API Endpoint",
+      "default": "/api/sms/opt-in",
+      "info": "Example: https://api.joevar.com/api/sms/opt-in"
+    },
+
+    {
+      "type": "text",
+      "id": "consent_version",
+      "label": "Consent Version",
+      "default": "2026-09-29",
+      "info": "Change this value whenever the consent wording or sender name changes."
+    },
+
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Agree & Sign Up for SMS"
+    },
+
+    {
+      "type": "text",
+      "id": "success_message",
+      "label": "Success Message",
+      "default": "Thank you. Your SMS consent has been received and a confirmation message has been sent."
+    },
+
+    {
+      "type": "color",
+      "id": "green_color",
+      "label": "Green Accent",
+      "default": "#237A45"
+    },
+
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#F7F8F7"
+    }
+
+  ],
+
+  "presets": [
+    {
+      "name": "SMS Opt-In"
+    }
+  ]
+}
+{% endschema %}

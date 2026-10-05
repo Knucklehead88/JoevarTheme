@@ -1,0 +1,161 @@
+{% comment %}
+  Everything Included Banner
+  Responsive desktop + mobile banner
+{% endcomment %}
+
+<section
+  class="everything-banner-section"
+  style="
+    --banner-max-width: {{ section.settings.max_width }}px;
+    --banner-radius: {{ section.settings.border_radius }}px;
+    --banner-padding-top: {{ section.settings.padding_top }}px;
+    --banner-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="everything-banner-inner">
+
+    {% if section.settings.desktop_image != blank %}
+      <picture>
+
+        {% if section.settings.mobile_image != blank %}
+          <source
+            media="(max-width: 749px)"
+            srcset="
+              {{ section.settings.mobile_image | image_url: width: 500 }} 500w,
+              {{ section.settings.mobile_image | image_url: width: 750 }} 750w,
+              {{ section.settings.mobile_image | image_url: width: 1000 }} 1000w
+            "
+          >
+        {% endif %}
+
+        {{
+          section.settings.desktop_image
+          | image_url: width: 2200
+          | image_tag:
+            class: 'everything-banner-image',
+            loading: 'lazy',
+            widths: '750, 1000, 1200, 1500, 1800, 2200',
+            sizes: '100vw'
+        }}
+
+      </picture>
+    {% else %}
+
+      <div class="everything-banner-placeholder">
+        Upload your banner image in the section settings.
+      </div>
+
+    {% endif %}
+
+  </div>
+</section>
+
+<style>
+  .everything-banner-section {
+    width: 100%;
+    padding-top: var(--banner-padding-top);
+    padding-bottom: var(--banner-padding-bottom);
+  }
+
+  .everything-banner-inner {
+    width: 100%;
+    max-width: var(--banner-max-width);
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .everything-banner-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--banner-radius);
+  }
+
+  .everything-banner-placeholder {
+    width: 100%;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f4f4;
+    border: 1px dashed #999;
+    text-align: center;
+    padding: 30px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .everything-banner-inner {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    .everything-banner-image {
+      width: 100%;
+      border-radius: 0;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Everything Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop banner image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile banner image"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 2000,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum banner width",
+      "default": 1600
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "label": "Corner radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Top spacing",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Bottom spacing",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Everything Banner"
+    }
+  ]
+}
+{% endschema %}

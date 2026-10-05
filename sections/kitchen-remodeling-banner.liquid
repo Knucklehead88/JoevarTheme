@@ -1,0 +1,261 @@
+<section class="kitchen-banner">
+  <div class="page-width">
+
+    <h1 class="kitchen-banner__title">
+      <span>Kitchen Remodeling</span>
+      <span class="green">Example</span>
+    </h1>
+
+    <div class="divider"></div>
+
+    <div class="services">
+      <div class="service">
+        📋
+        <span>Management</span>
+      </div>
+
+      <div class="service">
+        🔨
+        <span>Demolition</span>
+      </div>
+
+      <div class="service">
+        🗄️
+        <span>New Cabinets</span>
+      </div>
+
+      <div class="service">
+        🪨
+        <span>Quartz Countertops</span>
+      </div>
+
+      <div class="service">
+        🚰
+        <span>Sink</span>
+      </div>
+
+      <div class="service">
+        🚪
+        <span>Handles</span>
+      </div>
+    </div>
+
+    <div class="pricing">
+
+      <div class="price-card">
+        <p>
+          For <span class="green price-inline">10 cabinets</span> =
+          <span class="green price-inline">$12,000</span>
+          ( all the above included )
+        </p>
+      </div>
+
+      <div class="price-card">
+        <p>
+          If your kitchen has <span class="green price-inline">14 cabinets</span> =
+          <span class="green price-inline">$16,800</span>
+          ( all the above included )
+        </p>
+      </div>
+
+      <div class="price-card">
+        <p>
+          <span class="green price-inline">16 cabinets</span> =
+          <span class="green price-inline">$19,200</span>
+          ( all the above included )
+        </p>
+      </div>
+
+    </div>
+
+    <div class="cta-wrap">
+      <a href="/pages/contact" class="cta">
+        Contact Us Today for a Free Estimate
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<style>
+.kitchen-banner {
+  background: #fff;
+  padding: 70px 0;
+}
+
+.kitchen-banner .page-width {
+  max-width: 1400px;
+  margin: auto;
+}
+
+.kitchen-banner__title {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  text-transform: uppercase;
+  font-size: 36px;
+  line-height: 1.2;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+}
+
+.green {
+  color: #2f8f45;
+}
+
+.divider {
+  width: 100%;
+  height: 2px;
+  background: #2f8f45;
+  margin: 28px auto;
+}
+
+.services {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.service {
+  background: #fff;
+  padding: 30px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(21,128,61,0.14);
+  text-align: center;
+  transition: 0.3s ease;
+  border: none;
+  font-size: 28px;
+}
+
+.service:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(21,128,61,0.22);
+}
+
+.service span {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111;
+  margin-top: 8px;
+}
+
+.pricing {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.price-card {
+  background: #fff;
+  padding: 34px 28px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(21,128,61,0.14);
+  text-align: center;
+  transition: 0.3s ease;
+}
+
+.price-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(21,128,61,0.22);
+}
+
+.price-card p {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.45;
+  font-weight: 800;
+  color: #111;
+}
+
+.price-inline {
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.cta {
+  display: inline-block;
+  background: #15803d;
+  color: #fff;
+  text-decoration: none;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cta-wrap {
+  text-align: center;
+}
+
+.cta:hover {
+  background: #166534;
+}
+
+@media(max-width:1200px) {
+  .services,
+  .pricing {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .kitchen-banner__title {
+    font-size: 28px;
+  }
+}
+
+@media(max-width:749px) {
+  .kitchen-banner {
+    padding: 40px 0;
+  }
+
+  .kitchen-banner__title {
+    font-size: 24px;
+    gap: 6px;
+  }
+
+  .services,
+  .pricing {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .service {
+    padding: 20px 10px;
+    font-size: 26px;
+  }
+
+  .service span {
+    font-size: 17px;
+  }
+
+  .price-card {
+    padding: 26px 20px;
+  }
+
+  .price-card p {
+    font-size: 19px;
+  }
+
+  .cta {
+    width: 100%;
+    font-size: 16px;
+    padding: 14px 20px;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Kitchen Remodeling Banner",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Kitchen Remodeling Banner"
+    }
+  ]
+}
+{% endschema %}

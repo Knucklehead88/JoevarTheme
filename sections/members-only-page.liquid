@@ -1,0 +1,115 @@
+{% if page.handle == 'project-status' %}
+  {% if customer %}
+
+    {% comment %} <div class="page-width section-{{ section.id }}">
+      {% if section.settings.heading != blank %}
+        <h1>{{ section.settings.heading }}</h1>
+      {% endif %}
+
+      <div class="rte">
+        {{ section.settings.content }}
+      </div>
+
+      {{ page.content }}
+
+    </div> {% endcomment %}
+
+  <div id="project-data">
+    Loading...
+  </div>
+
+  <script type="module">
+  import { getProject, extractUrl } from "{{ 'mondayApi.js' | asset_url }}";
+  (async () => {
+    const email = "{{ customer.email }}";
+
+    const data = await getProject(encodeURIComponent(email))
+    console.log(data);
+
+    document.getElementById('project-data').innerHTML = `
+      <h2>Project Information</h2>
+
+      <p><strong>Email:</strong> ${data.project || ''}</p>
+      <p><strong>Address:</strong> ${data.fields[1]?.text || ''}</p>
+      <p><strong>Mobile:</strong> ${data.fields[2]?.text || ''}</p>
+
+      ${data.subitems.map(sub => `
+        <p><strong>Name:</strong> ${sub.name}</p>
+
+        <p><strong>Project Manager:</strong> ${sub.fields[0]?.text || ''}</p>
+        <p><strong>Project Type:</strong> ${sub.fields[1]?.text || ''}</p>
+        <p>
+          <strong>Scope of Work:</strong>
+          <a href="${extractUrl(sub.fields[2]?.text)}">
+          View
+          </a>
+        </p>
+        <p>
+          <strong>Contract:</strong>
+          <a href="${extractUrl(sub.fields[3]?.text)}">
+          View
+          </a>
+        </p>
+        <p>
+          <strong>Progress Photos:</strong>
+          <a href="${extractUrl(sub.fields[4]?.text)}">
+          View
+          </a>
+        </p>
+        <p>
+          <strong>Old Photos:</strong>
+          <a href="${extractUrl(sub.fields[5]?.text)}">
+          View
+          </a>
+        </p>
+        <p>
+          <strong>Conversation:</strong>
+          <a href="${extractUrl(sub.fields[6]?.text)}">
+          View
+          </a>
+        </p>
+      `).join('')}
+    `;
+  })();
+  </script>
+
+  {% else %}
+
+    <script>
+      window.location.href = "/account/login?return_url={{ request.path }}";
+    </script>
+
+    <noscript>
+      <div class="page-width">
+        <h2>Login Required</h2>
+        <p>You must be logged in to access this page.</p>
+        <a href="routes.account_login_url">Login</a>
+      </div>
+    </noscript>
+
+  {% endif %}
+{% endif %}
+
+{% schema %}
+{
+  "name": "Members Only Page",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Members Area"
+    },
+    {
+      "type": "richtext",
+      "id": "content",
+      "label": "Intro Content"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Members Only Page"
+    }
+  ]
+}
+{% endschema %}

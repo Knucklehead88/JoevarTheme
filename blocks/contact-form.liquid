@@ -123,6 +123,8 @@
       {{- form.body -}}
     </textarea>
 
+    {% render 'sms-consent-checkbox', id_suffix: form_id %}
+
     {{ submit_button }}
   {%- endform -%}
 </div>

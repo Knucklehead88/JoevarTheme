@@ -1,0 +1,196 @@
+{% comment %}
+  Optional SMS consent checkbox for contact forms that collect a phone number.
+  Render it inside a {% form 'contact' %} block that has a contact[phone] field.
+
+  When the box is checked, the consent proof is posted to the SMS opt-in API
+  (same payload as the SMS Opt-In section) before the form is submitted, and
+  the contact email records the consent either way.
+
+  Keep the sender name and wording in sync with sections/npd-sms-opt-in.liquid
+  and sections/npd-option-metaobject-slider.liquid. Bump the version whenever
+  either changes.
+
+  Accepts:
+  - id_suffix: {String} Unique suffix for element IDs (e.g. section.id or block.id)
+{% endcomment %}
+
+{%- assign sms_sender = 'Bumvar LLC dba Joevar' -%}
+{%- assign sms_endpoint = 'https://joevar-api.onrender.com/api/sms/opt-in' -%}
+{%- assign sms_consent_version = '2026-10-07' -%}
+
+{%- capture sms_consent_text -%}I agree to receive SMS messages from {{ sms_sender }} regarding appointments, scheduling, project updates, crew arrival notifications, permit/inspection updates, and other service-related communications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out or HELP for assistance. Consent is not a condition of purchase. See our Privacy Policy and Terms of Service.{%- endcapture -%}
+
+<div
+  class="sms-consent"
+  data-sms-consent
+  data-endpoint="{{ sms_endpoint | escape }}"
+  data-version="{{ sms_consent_version | escape }}"
+  data-text="{{ sms_consent_text | escape }}"
+>
+  <input type="hidden" name="contact[SMS Consent]" value="No" data-sms-consent-summary>
+
+  <label class="sms-consent__label" for="SmsConsent-{{ id_suffix }}">
+    <input type="checkbox" id="SmsConsent-{{ id_suffix }}" class="sms-consent__input" value="yes" data-sms-consent-input>
+    <span class="sms-consent__text">
+      (Optional) I agree to receive SMS messages from
+      <strong>{{ sms_sender | escape }}</strong> regarding appointments, scheduling, project updates,
+      crew arrival notifications, permit/inspection updates, and other service-related communications.
+      Message frequency varies. Message and data rates may apply.
+      Reply <strong>STOP</strong> to opt out or <strong>HELP</strong> for assistance.
+      Consent is not a condition of purchase.
+      See our <a href="/policies/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
+      and <a href="/policies/terms-of-service" target="_blank" rel="noopener">Terms of Service</a>.
+    </span>
+  </label>
+
+  <p class="sms-consent__error" role="alert" hidden data-sms-consent-error></p>
+</div>
+
+<style>
+  /* Extra specificity so theme and form input/label styles (e.g. width: 100%, align-items: center) don't apply. */
+  .sms-consent .sms-consent__label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+  }
+
+  .sms-consent .sms-consent__input {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  .sms-consent__text {
+    font-size: 12px;
+    line-height: 1.5;
+    opacity: 0.8;
+  }
+
+  .sms-consent__text a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .sms-consent__error {
+    margin: 8px 0 0;
+    font-size: 13px;
+    color: #b91c1c;
+  }
+</style>
+
+<script>
+  (function() {
+    if (window.smsConsentInitialized) return;
+    window.smsConsentInitialized = true;
+
+    function normalizePhone(value) {
+      var trimmed = (value || '').trim();
+      var digits = trimmed.replace(/\D/g, '');
+
+      if (trimmed.charAt(0) === '+') {
+        digits = '+' + digits;
+      } else if (digits.length === 10) {
+        digits = '+1' + digits;
+      } else if (digits.length === 11 && digits.charAt(0) === '1') {
+        digits = '+' + digits;
+      } else {
+        return null;
+      }
+
+      return /^\+[1-9]\d{7,14}$/.test(digits) ? digits : null;
+    }
+
+    function postConsent(container, phone) {
+      var controller = window.AbortController ? new AbortController() : null;
+      var timer = controller ? setTimeout(function() { controller.abort(); }, 5000) : null;
+
+      return fetch(container.dataset.endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          PhoneNumber: phone,
+          Consent: true,
+          ConsentTimestamp: new Date().toISOString(),
+          ConsentSource: window.location.href,
+          ConsentVersion: container.dataset.version,
+          ConsentText: container.dataset.text
+        }),
+        signal: controller ? controller.signal : undefined
+      })
+        .then(function(response) {
+          if (!response.ok) {
+            console.error('SMS consent request failed with status', response.status);
+          }
+        })
+        .catch(function(error) {
+          console.error('SMS consent request failed:', error);
+        })
+        .then(function() {
+          if (timer) clearTimeout(timer);
+        });
+    }
+
+    // Capture phase, so this runs before any other submit handlers (e.g. Shopify's spam protection).
+    // Once the consent is stored, the form is re-submitted normally and those handlers run as usual.
+    document.addEventListener('submit', function(event) {
+      var form = event.target;
+      var container = form.querySelector && form.querySelector('[data-sms-consent]');
+      if (!container) return;
+
+      var checkbox = container.querySelector('[data-sms-consent-input]');
+      var summary = container.querySelector('[data-sms-consent-summary]');
+      var error = container.querySelector('[data-sms-consent-error]');
+
+      if (form.dataset.smsConsentSent === 'true') return;
+
+      error.hidden = true;
+      error.textContent = '';
+
+      if (!checkbox.checked) {
+        summary.value = 'No';
+        return;
+      }
+
+      var phoneField = form.querySelector('[name="contact[phone]"]');
+      var phone = normalizePhone(phoneField ? phoneField.value : '');
+
+      if (!phone) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        error.textContent =
+          'To receive text messages, please enter your mobile number above, e.g. 312-555-1234.';
+        error.hidden = false;
+        if (phoneField) phoneField.focus();
+        return;
+      }
+
+      summary.value = 'Yes (' + phone + ', consent version ' + container.dataset.version + ')';
+
+      if (window.Shopify && Shopify.designMode) return;
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      var submitter = event.submitter;
+      if (submitter) submitter.disabled = true;
+
+      postConsent(container, phone).then(function() {
+        form.dataset.smsConsentSent = 'true';
+        if (submitter) submitter.disabled = false;
+
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit(submitter || undefined);
+        } else {
+          form.submit();
+        }
+      });
+    }, true);
+  })();
+</script>

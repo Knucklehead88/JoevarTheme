@@ -23,6 +23,10 @@
         <textarea name="contact[body]" placeholder="How can we help?" rows="5" required></textarea>
       </div>
 
+      <div class="npd-field">
+        {% render 'sms-consent-checkbox', id_suffix: section.id %}
+      </div>
+
       <button type="submit" class="npd-submit">
         {{ section.settings.button_label }}
       </button>
